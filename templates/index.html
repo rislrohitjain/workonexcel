@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WorkOnExcel | Pro Dashboard</title>
-    <!-- Google Fonts & Icons -->
+    <title>WorkOnExcel Pro | Rohit Jain</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,35 +13,38 @@
             --bg-deep: #0f172a;
             --card-slate: #1e293b;
             --accent-cyan: #38bdf8;
-            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-bg: rgba(30, 41, 59, 0.85);
         }
 
         body {
             background-color: var(--bg-deep);
             color: #f1f5f9;
             font-family: 'Inter', sans-serif;
-            padding-bottom: 100px; /* Space for floating bar */
+            padding-bottom: 120px;
         }
 
-        .glass-card {
+        .section-card {
             background: var(--card-slate);
             border: 1px solid rgba(56, 189, 248, 0.1);
             border-radius: 16px;
-            backdrop-filter: blur(10px);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .table-container {
-            border-radius: 16px;
+            border-radius: 0 0 16px 16px;
             overflow: hidden;
-            border: 1px solid #334155;
             background: #0b1120;
-        }
-
-        .table thead {
-            background-color: #1e293b;
-            position: sticky;
-            top: 0;
-            z-index: 10;
         }
 
         /* Floating Pagination Bar */
@@ -52,269 +54,253 @@
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 1000px;
+            max-width: 1100px;
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            border: 1px solid var(--accent-cyan);
             border-radius: 50px;
             z-index: 1000;
             padding: 12px 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
             display: none;
         }
 
-        .filter-row {
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.2s ease;
+        .copy-btn {
+            color: var(--accent-cyan);
+            cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .filter-row:hover {
-            background: rgba(56, 189, 248, 0.03);
-        }
+        .copy-btn:hover { transform: scale(1.2); color: #fff; }
 
         #loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.9); display: none;
+            background: rgba(15, 23, 42, 0.95); display: none;
             flex-direction: column; justify-content: center; align-items: center;
             z-index: 9999; backdrop-filter: blur(10px);
         }
 
-        .spinner-pro {
-            font-size: 4rem;
-            color: var(--accent-cyan);
-            animation: rotate 1s linear infinite;
-        }
-
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        .spinner-pro { font-size: 4rem; color: var(--accent-cyan); animation: fa-spin 2s linear infinite; }
     </style>
 </head>
 <body>
 
 <div id="loader-overlay">
-    <i class="fas fa-circle-notch spinner-pro"></i>
-    <h4 class="mt-4 fw-bold text-uppercase tracking-widest" id="loader-msg">Processing Engine</h4>
-    <p class="text-muted" id="loader-timer">Time: 0s</p>
+    <i class="fas fa-microchip spinner-pro"></i>
+    <h4 class="mt-4 fw-bold text-uppercase" id="loader-msg">Initializing Engine</h4>
+    <p class="text-muted" id="loader-timer">0s</p>
 </div>
 
 <div class="container py-5">
+    <!-- Branding Header -->
     <div class="d-flex align-items-center mb-5">
-        <div class="bg-primary p-3 rounded-4 shadow-lg me-3">
-            <i class="fas fa-bolt fs-2 text-white"></i>
+        <div class="bg-info p-3 rounded-4 shadow-lg me-3">
+            <i class="fas fa-file-excel fs-2 text-white"></i>
         </div>
         <div>
-            <h1 class="h2 mb-0 fw-700">WorkOnExcel <span class="badge bg-info fs-6">Pro</span></h1>
-            <p class="text-secondary small mb-0">High-Performance Data Virtualization v2.0</p>
+            <h1 class="h2 mb-0 fw-bold text-info">WorkOnExcel Pro</h1>
+            <p class="text-secondary mb-0">
+                Developed by <strong>Rohit Jain</strong> <span class="text-muted">(Sr. Software Engineer | BCA & MCA)</span>
+            </p>
         </div>
     </div>
 
-    <!-- Step 1: Upload -->
-    <div class="glass-card p-4 mb-4 shadow">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h6 class="text-uppercase fw-bold text-secondary small mb-0">1. Data Source</h6>
-            <a href="/download-template" class="btn btn-link text-info text-decoration-none small p-0">
-                <i class="fas fa-download me-1"></i> Get Sample Template
-            </a>
+    <!-- Section 1: Data Source -->
+    <div class="section-card shadow">
+        <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseSource">
+            <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-cloud-upload-alt me-2 text-primary"></i>1. Data Source</h6>
+            <i class="fas fa-chevron-down small text-muted"></i>
         </div>
-        <div class="input-group">
-            <input type="file" id="excelFile" class="form-control bg-dark border-secondary">
-            <button onclick="handleAction('upload')" class="btn btn-primary px-5 fw-bold">Initialize</button>
+        <div id="collapseSource" class="collapse show p-4">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="small text-muted">Upload CSV or XLSX to begin analysis</span>
+                <a href="/download-template" class="small text-info text-decoration-none"><i class="fas fa-download me-1"></i>Sample Template</a>
+            </div>
+            <div class="input-group">
+                <input type="file" id="excelFile" class="form-control bg-dark border-secondary">
+                <button onclick="handleAction('upload')" class="btn btn-primary px-5 fw-bold">Initialize</button>
+            </div>
         </div>
     </div>
 
-    <!-- Step 2: Controls -->
-    <div id="controls" class="glass-card p-4 mb-4 shadow" style="display:none;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h6 class="text-uppercase fw-bold text-info small mb-0">2. Filters & Sort Operations</h6>
-            <div>
+    <!-- Section 2: Filters -->
+    <div id="controls" class="section-card shadow" style="display:none;">
+        <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseFilters">
+            <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-filter me-2 text-success"></i>2. Filters & Sort Operations</h6>
+            <i class="fas fa-chevron-down small text-muted"></i>
+        </div>
+        <div id="collapseFilters" class="collapse show p-4">
+            <div class="d-flex justify-content-end mb-3">
+				<button onclick="resetFilters()" class="btn btn-outline-danger btn-sm px-4 me-2">
+					<i class="fas fa-undo me-1"></i> Reset
+				</button>
                 <button onclick="handleAction('filter')" class="btn btn-success btn-sm px-4 me-2">Apply All</button>
                 <button onclick="handleAction('export')" class="btn btn-warning btn-sm px-4 text-white">Export</button>
             </div>
+            <div id="filter-grid" class="border rounded p-3 bg-black bg-opacity-25"></div>
         </div>
-        <div id="filter-grid" class="border rounded p-3 bg-black bg-opacity-25"></div>
     </div>
 
-    <!-- Table Output -->
-    <div class="table-container shadow-lg">
-        <div class="table-responsive">
-            <table class="table table-hover table-dark mb-0" id="resultTable">
-                <thead>
-                    <tr><th class="p-5 text-center text-secondary">Awaiting data initialization...</th></tr>
-                </thead>
-            </table>
+    <!-- Section 3: Result Table -->
+    <div id="tableSection" class="section-card shadow" style="display:none;">
+        <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseTable">
+            <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-list me-2 text-info"></i>3. Filtered Information</h6>
+            <i class="fas fa-chevron-down small text-muted"></i>
+        </div>
+        <div id="collapseTable" class="collapse show">
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover table-dark mb-0" id="resultTable"></table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modern Floating Pagination Bar -->
+<!-- Floating Pagination -->
 <div id="pagination-bar">
-    <div class="row align-items-center">
+    <div class="row align-items-center text-center">
         <div class="col-md-3">
-            <div class="input-group input-group-sm">
-                <span class="input-group-text bg-transparent border-0 text-secondary">View</span>
-                <select id="pageSize" class="form-select bg-dark border-secondary text-info" onchange="changePageSize()">
-                    <option value="10">10</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                    <option value="1000">1,000</option>
-                    <option value="10000">10,000</option>
-                    <option value="100000">100,000</option>
-                    <option value="200000">200,000+</option>
-                </select>
-            </div>
+            <select id="pageSize" class="form-select form-select-sm bg-dark border-info text-info" onchange="changePageSize()">
+                <option value="10">Show 10</option>
+                <option value="100">Show 100</option>
+                <option value="1000">Show 1,000</option>
+                <option value="10000">Show 10,000</option>
+                <option value="200000">Show 200,000+</option>
+            </select>
         </div>
-        <div class="col-md-6 text-center">
-            <div class="btn-group">
-                <button class="btn btn-link text-info px-3" onclick="prevPage()"><i class="fas fa-chevron-left"></i></button>
-                <span class="btn btn-dark border-0 fw-bold px-4" id="pageIndicator" style="min-width: 150px;">Page 1</span>
-                <button class="btn btn-link text-info px-3" onclick="nextPage()"><i class="fas fa-chevron-right"></i></button>
-            </div>
+        <div class="col-md-6">
+            <button class="btn btn-link text-info p-0 px-3" onclick="prevPage()"><i class="fas fa-chevron-left"></i></button>
+            <span id="pageIndicator" class="fw-bold px-3">Page 1</span>
+            <button class="btn btn-link text-info p-0 px-3" onclick="nextPage()"><i class="fas fa-chevron-right"></i></button>
         </div>
-        <div class="col-md-3 text-end text-info fw-bold small">
-            <span id="recordCount">0 Rows Found</span>
-        </div>
+        <div class="col-md-3 text-end fw-bold small text-info" id="recordCount">0 Rows</div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    let filePath = "";
-    let lastResult = [];
-    let timerInt;
-    
-    // Pagination state
-    let currentPage = 1;
-    let rowsPerPage = 10;
+    let filePath = "", lastResult = [], timerInt;
+    let currentPage = 1, rowsPerPage = 10;
 
     function showLoader(m) {
         document.getElementById('loader-overlay').style.display = 'flex';
         document.getElementById('loader-msg').innerText = m;
         let s = 0;
-        timerInt = setInterval(() => { s++; document.getElementById('loader-timer').innerText = `Time: ${s}s`; }, 1000);
+        timerInt = setInterval(() => { s++; document.getElementById('loader-timer').innerText = s + 's'; }, 1000);
     }
 
-    function hideLoader() {
-        document.getElementById('loader-overlay').style.display = 'none';
-        clearInterval(timerInt);
-    }
+    function hideLoader() { document.getElementById('loader-overlay').style.display = 'none'; clearInterval(timerInt); }
 
     function generateUI(cols) {
-        const grid = document.getElementById('filter-grid');
-        grid.innerHTML = cols.map(c => `
-            <div class="row g-2 align-items-center filter-row f-row mb-2 pb-2" data-col="${c}">
+        document.getElementById('filter-grid').innerHTML = cols.map(c => `
+            <div class="row g-2 align-items-center mb-2 pb-2 border-bottom border-secondary f-row" data-col="${c}">
                 <div class="col-md-3 small fw-bold text-truncate text-info">${c}</div>
-                <div class="col-md-2">
-                    <select class="form-select form-select-sm op-in bg-dark border-secondary">
-                        <option value="=">=</option>
-                        <option value="like">Contains</option>
-                        <option value="!=">!=</option>
-                        <option value=">">&gt;</option>
-                        <option value="<">&lt;</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <input type="text" class="form-control form-control-sm val-in bg-dark border-secondary" placeholder="Value...">
-                </div>
-                <div class="col-md-4">
-                    <div class="btn-group btn-group-sm w-100">
-                        <input type="radio" class="btn-check" name="s_${c}" id="n_${c}" value="none" checked>
-                        <label class="btn btn-outline-secondary" for="n_${c}">None</label>
-                        <input type="radio" class="btn-check" name="s_${c}" id="a_${c}" value="asc">
-                        <label class="btn btn-outline-info" for="a_${c}">ASC</label>
-                        <input type="radio" class="btn-check" name="s_${c}" id="d_${c}" value="desc">
-                        <label class="btn btn-outline-info" for="d_${c}">DESC</label>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+                <div class="col-md-2"><select class="form-select form-select-sm op-in bg-dark"><option value="=">=</option><option value="like">Like</option><option value="!=">!=</option></select></div>
+                <div class="col-md-3"><input type="text" class="form-control form-control-sm val-in bg-dark"></div>
+                <div class="col-md-4"><div class="btn-group btn-group-sm w-100"><input type="radio" class="btn-check" name="s_${c}" id="n_${c}" value="none" checked><label class="btn btn-outline-secondary" for="n_${c}">None</label><input type="radio" class="btn-check" name="s_${c}" id="a_${c}" value="asc"><label class="btn btn-outline-primary" for="a_${c}">ASC</label><input type="radio" class="btn-check" name="s_${c}" id="d_${c}" value="desc"><label class="btn btn-outline-primary" for="d_${c}">DESC</label></div></div>
+            </div>`).join('');
     }
+
+	async function resetFilters() {
+		// 1. Clear all text inputs
+		document.querySelectorAll('.val-in').forEach(input => {
+			input.value = "";
+		});
+
+		// 2. Reset all operators to '='
+		document.querySelectorAll('.op-in').forEach(select => {
+			select.value = "=";
+		});
+
+		// 3. Reset all sort radios to 'none'
+		document.querySelectorAll('.f-row').forEach(row => {
+			const col = row.dataset.col;
+			const noneRadio = document.getElementById(`n_${col}`);
+			if (noneRadio) noneRadio.checked = true;
+		});
+
+		// 4. Trigger a fresh fetch with empty filters to show all data
+		showLoader("Resetting Filters...");
+		
+		const fd = new FormData();
+		fd.append('file_path', filePath);
+		fd.append('filters', JSON.stringify([])); // Send empty array
+		fd.append('sorts', JSON.stringify([]));   // Send empty array
+
+		try {
+			lastResult = await fetch('http://127.0.0.1:8000/filter', { 
+				method: 'POST', 
+				body: fd 
+			}).then(r => r.json());
+			
+			currentPage = 1;
+			renderTable(lastResult);
+			
+			// Optional: Smooth scroll to table after reset
+			document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
+		} catch (e) {
+			alert("Reset failed: " + e);
+		}
+		
+		hideLoader();
+	}
 
     async function handleAction(type) {
         if(type === 'upload') {
             const f = document.getElementById('excelFile').files[0];
-            if(!f) return alert("Select a file first.");
-            
-            showLoader("Virtualizing Engine...");
+            if(!f) return;
+            showLoader("Uploading...");
             const fd = new FormData(); fd.append('file', f);
-            
-            try {
-                const res = await fetch('/proxy-upload', { method: 'POST', body: fd }).then(r => r.json());
-                if(res.error) throw res.error;
-
-                filePath = res.path;
-                generateUI(res.columns);
-                document.getElementById('controls').style.display = 'block';
-
-                // Integrated Flow: Initial fetch
-                const initFd = new FormData();
-                initFd.append('file_path', filePath);
-                initFd.append('filters', JSON.stringify([]));
-                initFd.append('sorts', JSON.stringify([]));
-                
-                lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: initFd }).then(r => r.json());
-                
-                // Integrated Flow: Reset to Page 1
-                currentPage = 1;
-                renderTable(lastResult);
-            } catch (e) { alert(e); }
-
+            const res = await fetch('/proxy-upload', { method: 'POST', body: fd }).then(r => r.json());
+            filePath = res.path;
+            generateUI(res.columns);
+            document.getElementById('controls').style.display = 'block';
+            document.getElementById('tableSection').style.display = 'block';
+            await handleAction('filter');
         } else if(type === 'filter') {
-            showLoader("Processing AND Logic...");
+            showLoader("Fetching Data...");
             const filters = [], sorts = [];
             document.querySelectorAll('.f-row').forEach(r => {
                 const c = r.dataset.col, v = r.querySelector('.val-in').value, s = r.querySelector('input:checked').value;
-                if(v.trim() !== "") filters.push({ col: c, op: r.querySelector('.op-in').value, val: v });
+                if(v) filters.push({ col: c, op: r.querySelector('.op-in').value, val: v });
                 if(s !== "none") sorts.push({ col: c, desc: s === "desc" });
             });
-
-            const fd = new FormData();
-            fd.append('file_path', filePath);
-            fd.append('filters', JSON.stringify(filters));
-            fd.append('sorts', JSON.stringify(sorts));
-
-            try {
-                lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
-                
-                // Integrated Flow: Reset to Page 1 for new search
-                currentPage = 1;
-                renderTable(lastResult);
-            } catch (e) { alert("Filter error: " + e); }
-
+            const fd = new FormData(); fd.append('file_path', filePath); fd.append('filters', JSON.stringify(filters)); fd.append('sorts', JSON.stringify(sorts));
+            lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
+            currentPage = 1;
+            renderTable(lastResult);
         } else if(type === 'export') {
-            if(!lastResult.length) return alert("No data to export.");
-            showLoader("Finalizing Excel File...");
+            showLoader("Exporting...");
             const fd = new FormData(); fd.append('data', JSON.stringify(lastResult));
-            
-            try {
-                const res = await fetch('http://127.0.0.1:8000/export', { method: 'POST', body: fd }).then(r => r.json());
-                window.location.href = `/download-file?path=${encodeURIComponent(res.path)}`;
-            } catch (e) { alert(e); }
+            const res = await fetch('http://127.0.0.1:8000/export', { method: 'POST', body: fd }).then(r => r.json());
+            window.location.href = `/download-file?path=${encodeURIComponent(res.path)}`;
         }
         hideLoader();
     }
 
-    function renderTable(data) {
-        const total = data.length;
-        document.getElementById('recordCount').innerText = `${total.toLocaleString()} Rows Found`;
-        document.getElementById('pagination-bar').style.display = total > 0 ? 'block' : 'none';
+    function copyRow(btn) {
+        const rowData = btn.closest('tr').innerText;
+        navigator.clipboard.writeText(rowData).then(() => {
+            btn.classList.replace('fa-copy', 'fa-check');
+            setTimeout(() => btn.classList.replace('fa-check', 'fa-copy'), 1000);
+        });
+    }
 
-        // Slice data for pagination
+    function renderTable(data) {
         const start = (currentPage - 1) * rowsPerPage;
         const pageData = data.slice(start, start + rowsPerPage);
-
         const t = document.getElementById('resultTable');
-        if(!pageData.length) {
-            t.innerHTML = "<tr><td class='p-5 text-center'>No matching records.</td></tr>";
-            return;
-        }
+        document.getElementById('recordCount').innerText = `${data.length.toLocaleString()} Rows`;
+        document.getElementById('pagination-bar').style.display = data.length > 0 ? 'block' : 'none';
 
-        let h = `<thead class="table-dark"><tr>${Object.keys(pageData[0]).map(k => `<th class="text-nowrap border-secondary small">${k}</th>`).join('')}</tr></thead>`;
-        let b = `<tbody>` + pageData.map(r => `<tr>${Object.values(r).map(v => `<td class="text-nowrap text-secondary border-secondary x-small">${v ?? ''}</td>`).join('')}</tr>`).join('') + `</tbody>`;
+        if(!pageData.length) { t.innerHTML = "<tr><td class='p-5 text-center'>No records found</td></tr>"; return; }
+
+        let h = `<thead><tr><th>Copy</th>${Object.keys(pageData[0]).map(k => `<th>${k}</th>`).join('')}</tr></thead><tbody>`;
+        h += pageData.map(r => `<tr><td class="text-center"><i class="fas fa-copy copy-btn" onclick="copyRow(this)"></i></td>${Object.values(r).map(v => `<td class="text-nowrap small text-secondary">${v ?? ''}</td>`).join('')}</tr>`).join('');
+        t.innerHTML = h + "</tbody>";
         
-        t.innerHTML = h + b;
-        
-        const totalPages = Math.ceil(total / rowsPerPage) || 1;
+        const totalPages = Math.ceil(data.length / rowsPerPage) || 1;
         document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
     }
 
@@ -322,24 +308,12 @@
         rowsPerPage = parseInt(document.getElementById('pageSize').value);
         currentPage = 1;
         renderTable(lastResult);
+        // Slide to Filtered Information view automatically
+        document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function nextPage() {
-        if (currentPage < Math.ceil(lastResult.length / rowsPerPage)) {
-            currentPage++;
-            renderTable(lastResult);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
-
-    function prevPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable(lastResult);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    }
+    function nextPage() { if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { currentPage++; renderTable(lastResult); window.scrollTo({top: document.getElementById('tableSection').offsetTop, behavior: 'smooth'}); } }
+    function prevPage() { if(currentPage > 1) { currentPage--; renderTable(lastResult); window.scrollTo({top: document.getElementById('tableSection').offsetTop, behavior: 'smooth'}); } }
 </script>
-
 </body>
 </html>
