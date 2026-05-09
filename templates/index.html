@@ -37,13 +37,19 @@
         </div>
     </div>
     
-    <div class="card p-4 mb-4 shadow-lg">
-        <label class="form-label small fw-bold text-uppercase text-secondary mb-3">1. Select & Initialize Data</label>
-        <div class="input-group">
-            <input type="file" id="excelFile" class="form-control">
-            <button onclick="handleAction('upload')" class="btn btn-primary px-4">Upload & List Data</button>
-        </div>
-    </div>
+    <!-- Inside the Upload Section Card -->
+	<div class="card p-4 mb-4 shadow-lg">
+		<div class="d-flex justify-content-between align-items-center mb-3">
+			<label class="form-label small fw-bold text-uppercase text-secondary mb-0">1. Select & Initialize Data</label>
+			<a href="/download-template" class="btn btn-outline-info btn-sm">
+				<i class="fas fa-file-download me-1"></i> Download Sample Template
+			</a>
+		</div>
+		<div class="input-group">
+			<input type="file" id="excelFile" class="form-control">
+			<button onclick="handleAction('upload')" class="btn btn-primary px-4">Upload & List Data</button>
+		</div>
+	</div>
 
     <div id="controls" class="card p-4 mb-4 shadow-lg" style="display:none;">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -153,12 +159,25 @@
             renderTable(lastResult);
 
         } else if(type === 'export') {
-            if(!lastResult.length) return alert("No data available.");
-            showLoader("Generating Excel...");
-            const fd = new FormData(); fd.append('data', JSON.stringify(lastResult));
-            const res = await fetch('http://127.0.0.1:8000/export', { method: 'POST', body: fd }).then(r => r.json());
-            alert("Exported to server: " + res.path);
-        }
+			if(!lastResult.length) return alert("No data available to export.");
+			
+			showLoader("Generating Excel File...");
+			const fd = new FormData(); 
+			fd.append('data', JSON.stringify(lastResult));
+
+			try {
+				const res = await fetch('http://127.0.0.1:8000/export', { method: 'POST', body: fd }).then(r => r.json());
+				
+				if(res.path) {
+					// Trigger the download by calling the Flask download route
+					window.location.href = `/download-file?path=${encodeURIComponent(res.path)}`;
+				} else {
+					alert("Export failed on server.");
+				}
+			} catch (e) {
+				alert("Export error: " + e);
+			}
+		}
         hideLoader();
     }
 

@@ -3,5 +3,6 @@ uvicorn
 flask
 polars
 openpyxl
+xlsxwriter
 python-multipart
 requests
