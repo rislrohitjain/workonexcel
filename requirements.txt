@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+flask
+polars
+openpyxl
+python-multipart
+requests
