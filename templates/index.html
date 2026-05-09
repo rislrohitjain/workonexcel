@@ -159,23 +159,33 @@
             renderTable(lastResult);
 
         } else if(type === 'export') {
-			if(!lastResult.length) return alert("No data available to export.");
-			
+			if(!lastResult || lastResult.length === 0) {
+				alert("Table is empty. Filter data before exporting.");
+				hideLoader();
+				return;
+			}
+
 			showLoader("Generating Excel File...");
-			const fd = new FormData(); 
+			const fd = new FormData();
 			fd.append('data', JSON.stringify(lastResult));
 
 			try {
-				const res = await fetch('http://127.0.0.1:8000/export', { method: 'POST', body: fd }).then(r => r.json());
-				
-				if(res.path) {
-					// Trigger the download by calling the Flask download route
-					window.location.href = `/download-file?path=${encodeURIComponent(res.path)}`;
+				const response = await fetch('http://127.0.0.1:8000/export', { 
+					method: 'POST', 
+					body: fd 
+				});
+				const res = await response.json();
+				<!-- alert(res.path); -->
+				if (res.path) {
+					// SUCCESS: Redirect the current window to the download route
+					// This triggers the browser's native download dialog
+					const downloadUrl = `/download-file?path=${encodeURIComponent(res.path)}`;
+					window.location.href = downloadUrl;
 				} else {
-					alert("Export failed on server.");
+					alert("Server failed to generate file path.");
 				}
 			} catch (e) {
-				alert("Export error: " + e);
+				alert("Export failed: " + e);
 			}
 		}
         hideLoader();
