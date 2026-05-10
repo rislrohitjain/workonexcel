@@ -1,9 +1,21 @@
 from flask import Flask, render_template, request, jsonify, send_from_directory,send_file
+import sys
 # from flask import Flask, render_template, request, jsonify, send_file
 import requests
 import os
 
-app = Flask(__name__)
+# This logic handles paths for both regular Python and PyInstaller EXE
+def get_base_path():
+    if hasattr(sys, '_MEIPASS'):
+        return sys._MEIPASS
+    return os.path.abspath(".")
+
+base_dir = get_base_path()
+
+app = Flask(__name__, 
+            static_folder=os.path.join(base_dir, 'static'),
+            template_folder=os.path.join(base_dir, 'templates'))
+
 BACKEND_URL = "http://127.0.0.1:8000"
 
 @app.route('/')
@@ -13,7 +25,19 @@ def index():
 # New route to download the template
 @app.route('/download-template')
 def download_template():
-    return send_from_directory('static', 'sample_template.xlsx', as_attachment=True)
+    # Force the path to the static folder
+    static_path = os.path.join(base_dir, 'static')
+    filename = 'sample_template.xlsx'
+    
+    # Create the folder and a dummy file if it doesn't exist (Self-healing)
+    if not os.path.exists(static_path):
+        os.makedirs(static_path)
+    
+    file_full_path = os.path.join(static_path, filename)
+    if not os.path.exists(file_full_path):
+        return f"Template file missing at {file_full_path}. Please place the file there.", 404
+
+    return send_from_directory(static_path, filename, as_attachment=True)
 
 @app.route('/proxy-upload', methods=['POST'])
 def proxy_upload():

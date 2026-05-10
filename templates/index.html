@@ -41,13 +41,60 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
+        /* --- THE FIXED STICKY TABLE SYSTEM --- */
         .table-container {
+            max-height: 70vh;
+            overflow: auto; /* Handles both vertical and horizontal scroll */
             border-radius: 0 0 16px 16px;
-            overflow: hidden;
             background: #0b1120;
+            position: relative; /* Context for sticky header */
+            border: 1px solid rgba(56, 189, 248, 0.1);
         }
 
-        /* Floating Pagination Bar */
+        #resultTable {
+            border-collapse: separate; 
+            border-spacing: 0;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        /* HEADER FREEZE LOGIC */
+        #resultTable thead th {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: #1e293b !important;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            white-space: nowrap;
+            border-bottom: 2px solid var(--accent-cyan);
+            padding: 15px 12px;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        #resultTable td {
+            min-width: 150px;
+            padding: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            white-space: nowrap;
+            background-color: #0b1120;
+        }
+
+        /* Action Column Style */
+        #resultTable th:first-child, 
+        #resultTable td:first-child {
+            min-width: 80px;
+            width: 80px;
+            text-align: center;
+        }
+
+        #resultTable tbody tr:hover td {
+            background-color: rgba(56, 189, 248, 0.08) !important;
+        }
+
+        /* Pagination Bar Styling */
         #pagination-bar {
             position: fixed;
             bottom: 25px;
@@ -131,9 +178,9 @@
         </div>
         <div id="collapseFilters" class="collapse show p-4">
             <div class="d-flex justify-content-end mb-3">
-				<button onclick="resetFilters()" class="btn btn-outline-danger btn-sm px-4 me-2">
-					<i class="fas fa-undo me-1"></i> Reset
-				</button>
+                <button onclick="resetFilters()" class="btn btn-outline-danger btn-sm px-4 me-2">
+                    <i class="fas fa-undo me-1"></i> Reset
+                </button>
                 <button onclick="handleAction('filter')" class="btn btn-success btn-sm px-4 me-2">Apply All</button>
                 <button onclick="handleAction('export')" class="btn btn-warning btn-sm px-4 text-white">Export</button>
             </div>
@@ -149,9 +196,8 @@
         </div>
         <div id="collapseTable" class="collapse show">
             <div class="table-container">
-                <div class="table-responsive">
-                    <table class="table table-hover table-dark mb-0" id="resultTable"></table>
-                </div>
+                <!-- Removed table-responsive to fix sticky header conflict -->
+                <table class="table table-hover table-dark mb-0" id="resultTable"></table>
             </div>
         </div>
     </div>
@@ -202,49 +248,29 @@
             </div>`).join('');
     }
 
-	async function resetFilters() {
-		// 1. Clear all text inputs
-		document.querySelectorAll('.val-in').forEach(input => {
-			input.value = "";
-		});
+    async function resetFilters() {
+        document.querySelectorAll('.val-in').forEach(input => input.value = "");
+        document.querySelectorAll('.op-in').forEach(select => select.value = "=");
+        document.querySelectorAll('.f-row').forEach(row => {
+            const col = row.dataset.col;
+            const noneRadio = document.getElementById(`n_${col}`);
+            if (noneRadio) noneRadio.checked = true;
+        });
 
-		// 2. Reset all operators to '='
-		document.querySelectorAll('.op-in').forEach(select => {
-			select.value = "=";
-		});
+        showLoader("Resetting Filters...");
+        const fd = new FormData();
+        fd.append('file_path', filePath);
+        fd.append('filters', JSON.stringify([])); 
+        fd.append('sorts', JSON.stringify([])); 
 
-		// 3. Reset all sort radios to 'none'
-		document.querySelectorAll('.f-row').forEach(row => {
-			const col = row.dataset.col;
-			const noneRadio = document.getElementById(`n_${col}`);
-			if (noneRadio) noneRadio.checked = true;
-		});
-
-		// 4. Trigger a fresh fetch with empty filters to show all data
-		showLoader("Resetting Filters...");
-		
-		const fd = new FormData();
-		fd.append('file_path', filePath);
-		fd.append('filters', JSON.stringify([])); // Send empty array
-		fd.append('sorts', JSON.stringify([]));   // Send empty array
-
-		try {
-			lastResult = await fetch('http://127.0.0.1:8000/filter', { 
-				method: 'POST', 
-				body: fd 
-			}).then(r => r.json());
-			
-			currentPage = 1;
-			renderTable(lastResult);
-			
-			// Optional: Smooth scroll to table after reset
-			document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
-		} catch (e) {
-			alert("Reset failed: " + e);
-		}
-		
-		hideLoader();
-	}
+        try {
+            lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
+            currentPage = 1;
+            renderTable(lastResult);
+            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
+        } catch (e) { alert("Reset failed: " + e); }
+        hideLoader();
+    }
 
     async function handleAction(type) {
         if(type === 'upload') {
@@ -280,7 +306,10 @@
     }
 
     function copyRow(btn) {
-        const rowData = btn.closest('tr').innerText;
+        const row = btn.closest('tr');
+        const cells = Array.from(row.querySelectorAll('td')).slice(1);
+        const rowData = cells.map(td => td.innerText).join('\t');
+        
         navigator.clipboard.writeText(rowData).then(() => {
             btn.classList.replace('fa-copy', 'fa-check');
             setTimeout(() => btn.classList.replace('fa-check', 'fa-copy'), 1000);
@@ -296,24 +325,39 @@
 
         if(!pageData.length) { t.innerHTML = "<tr><td class='p-5 text-center'>No records found</td></tr>"; return; }
 
-        let h = `<thead><tr><th>Copy</th>${Object.keys(pageData[0]).map(k => `<th>${k}</th>`).join('')}</tr></thead><tbody>`;
+        let h = `<thead><tr><th>Action</th>${Object.keys(pageData[0]).map(k => `<th>${k}</th>`).join('')}</tr></thead><tbody>`;
         h += pageData.map(r => `<tr><td class="text-center"><i class="fas fa-copy copy-btn" onclick="copyRow(this)"></i></td>${Object.values(r).map(v => `<td class="text-nowrap small text-secondary">${v ?? ''}</td>`).join('')}</tr>`).join('');
         t.innerHTML = h + "</tbody>";
         
         const totalPages = Math.ceil(data.length / rowsPerPage) || 1;
         document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+        
+        // Ensure scroll resets to top of CONTAINER
+        document.querySelector('.table-container').scrollTop = 0;
     }
 
     function changePageSize() {
         rowsPerPage = parseInt(document.getElementById('pageSize').value);
         currentPage = 1;
         renderTable(lastResult);
-        // Slide to Filtered Information view automatically
         document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function nextPage() { if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { currentPage++; renderTable(lastResult); window.scrollTo({top: document.getElementById('tableSection').offsetTop, behavior: 'smooth'}); } }
-    function prevPage() { if(currentPage > 1) { currentPage--; renderTable(lastResult); window.scrollTo({top: document.getElementById('tableSection').offsetTop, behavior: 'smooth'}); } }
+    function nextPage() { 
+        if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { 
+            currentPage++; 
+            renderTable(lastResult); 
+            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' }); 
+        } 
+    }
+    
+    function prevPage() { 
+        if(currentPage > 1) { 
+            currentPage--; 
+            renderTable(lastResult); 
+            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' }); 
+        } 
+    }
 </script>
 </body>
 </html>
