@@ -14,6 +14,7 @@
             --card-slate: #1e293b;
             --accent-cyan: #38bdf8;
             --glass-bg: rgba(30, 41, 59, 0.85);
+            --gradient-pro: linear-gradient(45deg, #0ea5e9, #2dd4bf);
         }
 
         body {
@@ -31,6 +32,31 @@
             overflow: hidden;
         }
 
+        /* --- DOWNLOAD BUTTON STYLES --- */
+        .download-hero {
+            border-left: 4px solid var(--accent-cyan) !important;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+        }
+
+        .download-btn {
+            background: var(--gradient-pro);
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #0f172a !important;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
         .section-header {
             padding: 1.25rem;
             cursor: pointer;
@@ -41,13 +67,13 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* --- THE FIXED STICKY TABLE SYSTEM --- */
+        /* --- TABLE SYSTEM --- */
         .table-container {
             max-height: 70vh;
-            overflow: auto; /* Handles both vertical and horizontal scroll */
+            overflow: auto;
             border-radius: 0 0 16px 16px;
             background: #0b1120;
-            position: relative; /* Context for sticky header */
+            position: relative;
             border: 1px solid rgba(56, 189, 248, 0.1);
         }
 
@@ -58,7 +84,6 @@
             margin-bottom: 0;
         }
 
-        /* HEADER FREEZE LOGIC */
         #resultTable thead th {
             position: sticky;
             top: 0;
@@ -82,19 +107,11 @@
             background-color: #0b1120;
         }
 
-        /* Action Column Style */
-        #resultTable th:first-child, 
-        #resultTable td:first-child {
-            min-width: 80px;
-            width: 80px;
-            text-align: center;
-        }
-
         #resultTable tbody tr:hover td {
             background-color: rgba(56, 189, 248, 0.08) !important;
         }
 
-        /* Pagination Bar Styling */
+        /* Pagination Bar */
         #pagination-bar {
             position: fixed;
             bottom: 25px;
@@ -140,7 +157,7 @@
 
 <div class="container py-5">
     <!-- Branding Header -->
-    <div class="d-flex align-items-center mb-5">
+    <div class="d-flex align-items-center mb-4">
         <div class="bg-info p-3 rounded-4 shadow-lg me-3">
             <i class="fas fa-file-excel fs-2 text-white"></i>
         </div>
@@ -149,6 +166,25 @@
             <p class="text-secondary mb-0">
                 Developed by <strong>Rohit Jain</strong> <span class="text-muted">(Sr. Software Engineer | BCA & MCA)</span>
             </p>
+        </div>
+    </div>
+
+    <!-- NEW: Download Desktop App Section -->
+    <div class="section-card shadow-lg download-hero mb-5">
+        <div class="p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 p-3 rounded-circle me-3">
+                    <i class="fab fa-windows fs-3 text-info"></i>
+                </div>
+                <div>
+                    <h5 class="mb-1 fw-bold text-white">Get the Desktop Version</h5>
+                    <p class="text-muted small mb-0">Install WorkOnExcel Pro locally for faster processing of large datasets.</p>
+                </div>
+            </div>
+            <a href="file:///D:/projects/python/workonexcel/Output/WorkOnExcelRohitJainPro_Setup.exe" 
+               class="btn btn-lg px-5 download-btn shadow-sm">
+                <i class="fas fa-download me-2"></i>Download Installer (.exe)
+            </a>
         </div>
     </div>
 
@@ -196,7 +232,6 @@
         </div>
         <div id="collapseTable" class="collapse show">
             <div class="table-container">
-                <!-- Removed table-responsive to fix sticky header conflict -->
                 <table class="table table-hover table-dark mb-0" id="resultTable"></table>
             </div>
         </div>
@@ -223,7 +258,18 @@
         <div class="col-md-3 text-end fw-bold small text-info" id="recordCount">0 Rows</div>
     </div>
 </div>
-
+<footer>
+    <div class="container text-center">
+        <div class="mb-3">
+            <i class="fas fa-file-excel text-info fs-4 mx-2"></i>
+            <span class="fw-bold text-white">WorkOnExcel Pro v1.0</span>
+        </div>
+        <p class="footer-text mb-1">Developed by <strong>Rohit Jain</strong></p>
+        <p class="text-muted small mb-0">Sr. Software Engineer | BCA & MCA</p>
+        <hr class="w-25 mx-auto my-3 border-secondary opacity-25">
+        <p class="text-muted x-small" style="font-size: 0.75rem;">&copy; 2026. All rights reserved.</p>
+    </div>
+</footer>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let filePath = "", lastResult = [], timerInt;
@@ -248,42 +294,20 @@
             </div>`).join('');
     }
 
-    async function resetFilters() {
-        document.querySelectorAll('.val-in').forEach(input => input.value = "");
-        document.querySelectorAll('.op-in').forEach(select => select.value = "=");
-        document.querySelectorAll('.f-row').forEach(row => {
-            const col = row.dataset.col;
-            const noneRadio = document.getElementById(`n_${col}`);
-            if (noneRadio) noneRadio.checked = true;
-        });
-
-        showLoader("Resetting Filters...");
-        const fd = new FormData();
-        fd.append('file_path', filePath);
-        fd.append('filters', JSON.stringify([])); 
-        fd.append('sorts', JSON.stringify([])); 
-
-        try {
-            lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
-            currentPage = 1;
-            renderTable(lastResult);
-            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
-        } catch (e) { alert("Reset failed: " + e); }
-        hideLoader();
-    }
-
     async function handleAction(type) {
         if(type === 'upload') {
             const f = document.getElementById('excelFile').files[0];
             if(!f) return;
             showLoader("Uploading...");
             const fd = new FormData(); fd.append('file', f);
-            const res = await fetch('/proxy-upload', { method: 'POST', body: fd }).then(r => r.json());
-            filePath = res.path;
-            generateUI(res.columns);
-            document.getElementById('controls').style.display = 'block';
-            document.getElementById('tableSection').style.display = 'block';
-            await handleAction('filter');
+            try {
+                const res = await fetch('/proxy-upload', { method: 'POST', body: fd }).then(r => r.json());
+                filePath = res.path;
+                generateUI(res.columns);
+                document.getElementById('controls').style.display = 'block';
+                document.getElementById('tableSection').style.display = 'block';
+                await handleAction('filter');
+            } catch (e) { alert("Upload failed. Ensure backend is running."); }
         } else if(type === 'filter') {
             showLoader("Fetching Data...");
             const filters = [], sorts = [];
@@ -293,9 +317,11 @@
                 if(s !== "none") sorts.push({ col: c, desc: s === "desc" });
             });
             const fd = new FormData(); fd.append('file_path', filePath); fd.append('filters', JSON.stringify(filters)); fd.append('sorts', JSON.stringify(sorts));
-            lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
-            currentPage = 1;
-            renderTable(lastResult);
+            try {
+                lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
+                currentPage = 1;
+                renderTable(lastResult);
+            } catch (e) { alert("Filter failed."); }
         } else if(type === 'export') {
             showLoader("Exporting...");
             const fd = new FormData(); fd.append('data', JSON.stringify(lastResult));
@@ -303,17 +329,6 @@
             window.location.href = `/download-file?path=${encodeURIComponent(res.path)}`;
         }
         hideLoader();
-    }
-
-    function copyRow(btn) {
-        const row = btn.closest('tr');
-        const cells = Array.from(row.querySelectorAll('td')).slice(1);
-        const rowData = cells.map(td => td.innerText).join('\t');
-        
-        navigator.clipboard.writeText(rowData).then(() => {
-            btn.classList.replace('fa-copy', 'fa-check');
-            setTimeout(() => btn.classList.replace('fa-check', 'fa-copy'), 1000);
-        });
     }
 
     function renderTable(data) {
@@ -331,33 +346,28 @@
         
         const totalPages = Math.ceil(data.length / rowsPerPage) || 1;
         document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
-        
-        // Ensure scroll resets to top of CONTAINER
         document.querySelector('.table-container').scrollTop = 0;
+    }
+
+    function copyRow(btn) {
+        const row = btn.closest('tr');
+        const cells = Array.from(row.querySelectorAll('td')).slice(1);
+        const rowData = cells.map(td => td.innerText).join('\t');
+        navigator.clipboard.writeText(rowData).then(() => {
+            btn.classList.replace('fa-copy', 'fa-check');
+            setTimeout(() => btn.classList.replace('fa-check', 'fa-copy'), 1000);
+        });
     }
 
     function changePageSize() {
         rowsPerPage = parseInt(document.getElementById('pageSize').value);
         currentPage = 1;
         renderTable(lastResult);
-        document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    function nextPage() { 
-        if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { 
-            currentPage++; 
-            renderTable(lastResult); 
-            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' }); 
-        } 
-    }
-    
-    function prevPage() { 
-        if(currentPage > 1) { 
-            currentPage--; 
-            renderTable(lastResult); 
-            document.getElementById('tableSection').scrollIntoView({ behavior: 'smooth' }); 
-        } 
-    }
+    function nextPage() { if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { currentPage++; renderTable(lastResult); } }
+    function prevPage() { if(currentPage > 1) { currentPage--; renderTable(lastResult); } }
 </script>
+
 </body>
 </html>
