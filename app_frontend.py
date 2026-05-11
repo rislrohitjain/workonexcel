@@ -39,6 +39,24 @@ def download_template():
 
     return send_from_directory(static_path, filename, as_attachment=True)
 
+@app.route('/download-installer')
+def download_installer():
+    # Define the directory where your EXE is stored
+    output_path = os.path.join(base_dir, 'Output')
+    filename = 'WorkOnExcelRohitJainPro_Setup.exe'
+    
+    # Self-healing: Ensure directory exists
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+    
+    file_full_path = os.path.join(output_path, filename)
+    
+    # Check if the installer actually exists
+    if not os.path.exists(file_full_path):
+        return f"Installer missing at {file_full_path}. Please place the setup file there.", 404
+
+    return send_from_directory(output_path, filename, as_attachment=True)
+    
 @app.route('/proxy-upload', methods=['POST'])
 def proxy_upload():
     if 'file' not in request.files:
