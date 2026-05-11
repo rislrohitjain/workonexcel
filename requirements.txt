@@ -3,6 +3,7 @@ uvicorn
 flask
 polars
 fastexcel
+psutil
 openpyxl
 xlsxwriter
 python-multipart

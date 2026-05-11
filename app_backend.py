@@ -1,11 +1,13 @@
 import os
 import json
 import logging
+import traceback
+import time
+import psutil
 import polars as pl
 from datetime import datetime
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import traceback
 
 # --- LOGGING CONFIGURATION ---
 logging.basicConfig(
@@ -14,8 +16,10 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 
+# --- INITIALIZE APP ---
 app = FastAPI()
 
+# --- CONFIGURE MIDDLEWARE ---
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -23,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# --- CONFIGURATION & UTILS ---
 UPLOAD_ROOT = "uploads"
 EXPORT_ROOT = "exports"
 
@@ -30,6 +35,8 @@ def get_dated_path(root):
     path = os.path.join(root, datetime.now().strftime("%Y-%m-%d"))
     os.makedirs(path, exist_ok=True)
     return path
+
+# --- ROUTES ---
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
@@ -46,7 +53,11 @@ async def upload_file(file: UploadFile = File(...)):
         with open(file_path, "wb") as f:
             f.write(content)
         
-        df = pl.read_excel(file_path) if new_filename.endswith(('.xlsx', '.xls')) else pl.read_csv(file_path)
+        # Read file using Polars
+        if new_filename.endswith(('.xlsx', '.xls')):
+            df = pl.read_excel(file_path)
+        else:
+            df = pl.read_csv(file_path)
         
         return {
             "filename": new_filename,
@@ -60,8 +71,16 @@ async def upload_file(file: UploadFile = File(...)):
 
 @app.post("/filter")
 async def filter_data(file_path: str = Form(...), filters: str = Form(...), sorts: str = Form(...)):
+    start_time = time.time()  # Start performance timer
     try:
-        df = pl.read_excel(file_path) if file_path.endswith(('.xlsx', '.xls')) else pl.read_csv(file_path)
+        # Resource monitoring
+        process = psutil.Process(os.getpid())
+        
+        # Read the file
+        if file_path.endswith(('.xlsx', '.xls')):
+            df = pl.read_excel(file_path)
+        else:
+            df = pl.read_csv(file_path)
         
         # 1. Apply Filters
         filter_list = json.loads(filters)
@@ -94,14 +113,24 @@ async def filter_data(file_path: str = Form(...), filters: str = Form(...), sort
 
         # 3. Add Serial Number
         if len(df) > 0:
-            # Check if S.No already exists to avoid "Duplicate Column" errors
             if "S.No" in df.columns:
                 df = df.drop("S.No")
-            
-            # CORRECT SYNTAX: pl.Series (Capital S)
             df = df.insert_column(0, pl.Series("S.No", list(range(1, len(df) + 1))))
         
-        return df.to_dicts()
+        # 4. Calculate Performance
+        execution_time = round(time.time() - start_time, 4)
+        
+        return {
+            "data": df.to_dicts(),
+            "performance": {
+                "execution_time": f"{execution_time}s",
+                "memory_usage": f"{round(process.memory_info().rss / (1024 * 1024), 2)} MB",
+                "cpu_utilization": f"{psutil.cpu_percent()}%",
+                "physical_cores": psutil.cpu_count(logical=False), # Physical only
+                "logical_cores": psutil.cpu_count(logical=True),   # Total threads
+                "total_records": len(df)
+            }
+        }
 
     except Exception as e:
         logging.error(f"Filter Error at {file_path}:\n{traceback.format_exc()}")
@@ -114,12 +143,17 @@ async def export_data(data: str = Form(...)):
         dir_path = get_dated_path(EXPORT_ROOT)
         filename = f"export_{datetime.now().strftime('%H%M%S')}.xlsx"
         path = os.path.join(dir_path, filename)
+        
+        # Write to Excel
         df.write_excel(path)
+        
         return {"path": path}
     except Exception as e:
         logging.error(f"Export Error:\n{traceback.format_exc()}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# --- MAIN EXECUTION ---
 if __name__ == "__main__":
     import uvicorn
+    # Note: Running with reload=True via command line is better for development
     uvicorn.run(app, host="127.0.0.1", port=8000)

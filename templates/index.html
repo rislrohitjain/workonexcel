@@ -32,7 +32,6 @@
             overflow: hidden;
         }
 
-        /* --- DOWNLOAD BUTTON STYLES --- */
         .download-hero {
             border-left: 4px solid var(--accent-cyan) !important;
             background: linear-gradient(145deg, #1e293b, #0f172a);
@@ -53,10 +52,6 @@
             filter: brightness(1.1);
         }
 
-        .download-btn:active {
-            transform: translateY(0);
-        }
-
         .section-header {
             padding: 1.25rem;
             cursor: pointer;
@@ -67,7 +62,6 @@
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* --- TABLE SYSTEM --- */
         .table-container {
             max-height: 70vh;
             overflow: auto;
@@ -77,65 +71,46 @@
             border: 1px solid rgba(56, 189, 248, 0.1);
         }
 
-        #resultTable {
-            border-collapse: separate; 
-            border-spacing: 0;
-            width: 100%;
-            margin-bottom: 0;
-        }
-
         #resultTable thead th {
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            position: sticky; top: 0; z-index: 100;
             background-color: #1e293b !important;
             box-shadow: 0 2px 5px rgba(0,0,0,0.5);
             white-space: nowrap;
             border-bottom: 2px solid var(--accent-cyan);
             padding: 15px 12px;
             color: var(--accent-cyan);
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            font-weight: 700;
+            text-transform: uppercase; font-size: 0.8rem; font-weight: 700;
         }
 
-        #resultTable td {
-            min-width: 150px;
-            padding: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            white-space: nowrap;
-            background-color: #0b1120;
-        }
-
-        #resultTable tbody tr:hover td {
-            background-color: rgba(56, 189, 248, 0.08) !important;
-        }
-
-        /* Pagination Bar */
         #pagination-bar {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            max-width: 1100px;
-            background: var(--glass-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--accent-cyan);
-            border-radius: 50px;
-            z-index: 1000;
-            padding: 12px 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+            position: fixed; bottom: 25px; left: 50%;
+            transform: translateX(-50%); width: 90%; max-width: 1100px;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border: 1px solid var(--accent-cyan); border-radius: 50px;
+            z-index: 1000; padding: 12px 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
             display: none;
         }
 
-        .copy-btn {
-            color: var(--accent-cyan);
-            cursor: pointer;
-            transition: transform 0.2s;
+        .summary-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.9));
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 12px;
         }
 
-        .copy-btn:hover { transform: scale(1.2); color: #fff; }
+        .stat-box {
+            padding: 15px; text-align: center;
+            border-right: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .stat-box:last-child { border-right: none; }
+
+        .feature-badge {
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 5px 15px; border-radius: 20px;
+            font-size: 0.8rem; margin: 5px; display: inline-block;
+        }
 
         #loader-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -156,7 +131,6 @@
 </div>
 
 <div class="container py-5">
-    <!-- Branding Header -->
     <div class="d-flex align-items-center mb-4">
         <div class="bg-info p-3 rounded-4 shadow-lg me-3">
             <i class="fas fa-file-excel fs-2 text-white"></i>
@@ -169,7 +143,6 @@
         </div>
     </div>
 
-    <!-- NEW: Download Desktop App Section -->
     <div class="section-card shadow-lg download-hero mb-5">
         <div class="p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div class="d-flex align-items-center">
@@ -181,14 +154,12 @@
                     <p class="text-muted small mb-0">Install WorkOnExcel Pro locally for faster processing of large datasets.</p>
                 </div>
             </div>
-			<!-- This href matches the route defined below -->
-			<a href="/download-installer" class="btn btn-lg px-5 download-btn shadow-sm">
-				<i class="fas fa-download me-2"></i>Download Installer (.exe)
-			</a>
+            <a href="/download-installer" class="btn btn-lg px-5 download-btn shadow-sm">
+                <i class="fas fa-download me-2"></i>Download Installer (.exe)
+            </a>
         </div>
     </div>
 
-    <!-- Section 1: Data Source -->
     <div class="section-card shadow">
         <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseSource">
             <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-cloud-upload-alt me-2 text-primary"></i>1. Data Source</h6>
@@ -206,7 +177,6 @@
         </div>
     </div>
 
-    <!-- Section 2: Filters -->
     <div id="controls" class="section-card shadow" style="display:none;">
         <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseFilters">
             <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-filter me-2 text-success"></i>2. Filters & Sort Operations</h6>
@@ -214,9 +184,6 @@
         </div>
         <div id="collapseFilters" class="collapse show p-4">
             <div class="d-flex justify-content-end mb-3">
-                <button onclick="resetFilters()" class="btn btn-outline-danger btn-sm px-4 me-2">
-                    <i class="fas fa-undo me-1"></i> Reset
-                </button>
                 <button onclick="handleAction('filter')" class="btn btn-success btn-sm px-4 me-2">Apply All</button>
                 <button onclick="handleAction('export')" class="btn btn-warning btn-sm px-4 text-white">Export</button>
             </div>
@@ -224,7 +191,6 @@
         </div>
     </div>
 
-    <!-- Section 3: Result Table -->
     <div id="tableSection" class="section-card shadow" style="display:none;">
         <div class="section-header" data-bs-toggle="collapse" data-bs-target="#collapseTable">
             <h6 class="mb-0 text-uppercase fw-bold"><i class="fas fa-list me-2 text-info"></i>3. Filtered Information</h6>
@@ -236,9 +202,52 @@
             </div>
         </div>
     </div>
+
+    <div id="summarySection" class="mt-5" style="display:none;">
+        <div class="section-card shadow-lg overflow-hidden">
+            <div class="section-header">
+                <h6 class="mb-0 text-uppercase fw-bold text-warning"><i class="fas fa-chart-line me-2"></i>Performance & Analysis Summary</h6>
+            </div>
+           <div class="p-0">
+				<div class="row g-0 summary-card">
+					<div class="col-6 col-md-2 stat-box">
+						<small class="text-muted d-block">Time Taken</small>
+						<span id="stat-time" class="fw-bold text-info">--</span>
+					</div>
+					<div class="col-6 col-md-2 stat-box">
+						<small class="text-muted d-block">Memory Used</small>
+						<span id="stat-mem" class="fw-bold text-info">--</span>
+					</div>
+					<div class="col-6 col-md-2 stat-box">
+						<small class="text-muted d-block">CPU Load</small>
+						<span id="stat-cpu" class="fw-bold text-info">--</span>
+					</div>
+					<div class="col-6 col-md-1 stat-box">
+						<small class="text-muted d-block">P-Cores</small>
+						<span id="stat-pcores" class="fw-bold text-info">--</span>
+					</div>
+					<div class="col-6 col-md-1 stat-box">
+						<small class="text-muted d-block">L-Cores</small>
+						<span id="stat-lcores" class="fw-bold text-info">--</span>
+					</div>
+					<div class="col-12 col-md-4 stat-box">
+						<small class="text-muted d-block">Processed Records</small>
+						<span id="stat-records" class="fw-bold text-info">--</span>
+					</div>
+				</div>
+			</div>
+            <div class="p-3 bg-black bg-opacity-25 border-top border-secondary border-opacity-25">
+                <div id="feature-list">
+                    <span class="feature-badge"><i class="fas fa-check-circle me-1"></i>Polars Rust Engine</span>
+                    <span class="feature-badge"><i class="fas fa-check-circle me-1"></i>Lazy Evaluation</span>
+                    <span class="feature-badge"><i class="fas fa-check-circle me-1"></i>SIMD Parallelism</span>
+                    <span class="feature-badge"><i class="fas fa-check-circle me-1"></i>Memory Mapping</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Floating Pagination -->
 <div id="pagination-bar">
     <div class="row align-items-center text-center">
         <div class="col-md-3">
@@ -247,7 +256,10 @@
                 <option value="100">Show 100</option>
                 <option value="1000">Show 1,000</option>
                 <option value="10000">Show 10,000</option>
-                <option value="200000">Show 200,000+</option>
+                <option value="100000">Show 1,00,000</option>
+                <option value="500000">Show 5,00,000</option>
+                <option value="1000000">Show 10,00,000</option>
+                <option value="5000000">Show 50,00,000</option>
             </select>
         </div>
         <div class="col-md-6">
@@ -258,18 +270,20 @@
         <div class="col-md-3 text-end fw-bold small text-info" id="recordCount">0 Rows</div>
     </div>
 </div>
+
 <footer>
-    <div class="container text-center">
+    <div class="container text-center mt-5">
         <div class="mb-3">
             <i class="fas fa-file-excel text-info fs-4 mx-2"></i>
             <span class="fw-bold text-white">WorkOnExcel Pro v1.0</span>
         </div>
-        <p class="footer-text mb-1">Developed by <strong>Rohit Jain</strong></p>
+        <p class="mb-1">Developed by <strong>Rohit Jain</strong></p>
         <p class="text-muted small mb-0">Sr. Software Engineer | BCA & MCA</p>
         <hr class="w-25 mx-auto my-3 border-secondary opacity-25">
-        <p class="text-muted x-small" style="font-size: 0.75rem;">&copy; 2026. All rights reserved.</p>
+        <p class="text-muted" style="font-size: 0.75rem;">&copy; 2026. All rights reserved.</p>
     </div>
 </footer>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     let filePath = "", lastResult = [], timerInt;
@@ -307,9 +321,9 @@
                 document.getElementById('controls').style.display = 'block';
                 document.getElementById('tableSection').style.display = 'block';
                 await handleAction('filter');
-            } catch (e) { alert("Upload failed. Ensure backend is running."); }
+            } catch (e) { alert("Upload failed."); }
         } else if(type === 'filter') {
-            showLoader("Fetching Data...");
+            showLoader("Processing...");
             const filters = [], sorts = [];
             document.querySelectorAll('.f-row').forEach(r => {
                 const c = r.dataset.col, v = r.querySelector('.val-in').value, s = r.querySelector('input:checked').value;
@@ -318,10 +332,50 @@
             });
             const fd = new FormData(); fd.append('file_path', filePath); fd.append('filters', JSON.stringify(filters)); fd.append('sorts', JSON.stringify(sorts));
             try {
-                lastResult = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd }).then(r => r.json());
-                currentPage = 1;
-                renderTable(lastResult);
-            } catch (e) { alert("Filter failed."); }
+				const res = await fetch('http://127.0.0.1:8000/filter', { method: 'POST', body: fd });
+				
+				if (!res.ok) throw new Error('Network response was not ok');
+				
+				const response = await res.json();
+				const { data, performance: perf } = response;
+
+				// 1. Update Table State
+				lastResult = data;
+				currentPage = 1;
+				renderTable(lastResult);
+
+				// 2. Show Summary Section
+				document.getElementById('summarySection').style.display = 'block';
+
+				// 3. Batch Update Performance Stats (Updated for Physical/Logical)
+				const stats = {
+					'stat-time': perf.execution_time,
+					'stat-mem':  perf.memory_usage,
+					'stat-cpu':  perf.cpu_utilization,
+					'stat-lcores': perf.logical_cores,    // Logical Threads
+					'stat-pcores': perf.physical_cores,  // Physical Cores
+					'stat-records': perf.total_records?.toLocaleString()
+				};
+				
+				
+				
+
+				for (const [id, value] of Object.entries(stats)) {
+					const element = document.getElementById(id);
+					if (element) {
+						// Apply value or default to N/A
+						element.innerText = value ?? 'N/A';
+						
+						// Optimization: Add a tooltip to distinguish core types
+						if (id === 'stat-lcores') element.title = "Logical Processors";
+						if (id === 'stat-pcores') element.title = "Physical Cores";
+					}
+				}
+
+			} catch (e) {
+				console.error("Filter Error:", e);
+				alert("Filter failed. Please check the backend connection.");
+			}
         } else if(type === 'export') {
             showLoader("Exporting...");
             const fd = new FormData(); fd.append('data', JSON.stringify(lastResult));
@@ -337,37 +391,17 @@
         const t = document.getElementById('resultTable');
         document.getElementById('recordCount').innerText = `${data.length.toLocaleString()} Rows`;
         document.getElementById('pagination-bar').style.display = data.length > 0 ? 'block' : 'none';
-
         if(!pageData.length) { t.innerHTML = "<tr><td class='p-5 text-center'>No records found</td></tr>"; return; }
-
         let h = `<thead><tr><th>Action</th>${Object.keys(pageData[0]).map(k => `<th>${k}</th>`).join('')}</tr></thead><tbody>`;
         h += pageData.map(r => `<tr><td class="text-center"><i class="fas fa-copy copy-btn" onclick="copyRow(this)"></i></td>${Object.values(r).map(v => `<td class="text-nowrap small text-secondary">${v ?? ''}</td>`).join('')}</tr>`).join('');
         t.innerHTML = h + "</tbody>";
-        
         const totalPages = Math.ceil(data.length / rowsPerPage) || 1;
         document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
-        document.querySelector('.table-container').scrollTop = 0;
     }
 
-    function copyRow(btn) {
-        const row = btn.closest('tr');
-        const cells = Array.from(row.querySelectorAll('td')).slice(1);
-        const rowData = cells.map(td => td.innerText).join('\t');
-        navigator.clipboard.writeText(rowData).then(() => {
-            btn.classList.replace('fa-copy', 'fa-check');
-            setTimeout(() => btn.classList.replace('fa-check', 'fa-copy'), 1000);
-        });
-    }
-
-    function changePageSize() {
-        rowsPerPage = parseInt(document.getElementById('pageSize').value);
-        currentPage = 1;
-        renderTable(lastResult);
-    }
-
+    function changePageSize() { rowsPerPage = parseInt(document.getElementById('pageSize').value); currentPage = 1; renderTable(lastResult); }
     function nextPage() { if(currentPage < Math.ceil(lastResult.length/rowsPerPage)) { currentPage++; renderTable(lastResult); } }
     function prevPage() { if(currentPage > 1) { currentPage--; renderTable(lastResult); } }
 </script>
-
 </body>
 </html>
